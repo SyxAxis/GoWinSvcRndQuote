@@ -22,20 +22,14 @@ type Quote struct {
 // called by Execute()
 func InitCustomCode() {
 
-	ticker := time.NewTicker(1 * time.Hour)
-	done := make(chan bool)
+	ticker := time.NewTicker(1 * time.Minute)
 
-	for {
-		select {
-		case <-done:
-			return
-		case t := <-ticker.C:
-			quote, err := GetRandomQuote()
-			if err != nil {
-				windowsEventlog.Error(999, err.Error())
-			} else {
-				windowsEventlog.Info(999, fmt.Sprintf("(%v) \n \"%s\" - %s", t, quote.QtContent, quote.QtAuthor))
-			}
+	for tickCh := range ticker.C {
+		quote, err := GetRandomQuote()
+		if err != nil {
+			windowsEventlog.Error(999, err.Error())
+		} else {
+			windowsEventlog.Info(999, fmt.Sprintf("(%v) \n \"%s\" - %s", tickCh, quote.QtContent, quote.QtAuthor))
 		}
 	}
 
